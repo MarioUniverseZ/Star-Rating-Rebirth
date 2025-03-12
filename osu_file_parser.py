@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 # ...Why does python 3.x change next to __next__......
 
@@ -12,6 +13,8 @@ def collect_data(data, new_datum):
 
 # Parser Class that can be used on other class.
 
+class InvalidModeError(Exception):
+    pass
 
 class parser:
     def __init__(self, file_path):
@@ -24,12 +27,19 @@ class parser:
         self.note_starts = []
         self.note_ends = []
         self.note_types = []
+        self.title = ""
+        self.artist = ""
+
+    def get_title_artist(self):
+        with open(self.file_path, 'r', encoding='utf-8') as f:
+            self.title, self.artist = self.read_metadata(f)
 
     def process(self):
         with open(self.file_path, "r+", encoding='utf-8') as f:
+
             try:
+                self.read_mode(f)
                 for line in f:
-                    self.read_metadata(f, line)
 
                     temp_cc = self.read_column_count(f, line)
                     if temp_cc != -1:
@@ -44,13 +54,34 @@ class parser:
 
             except StopIteration:
                 pass
+            except InvalidModeError:
+                sys.exit()
+
+    def read_mode(self, f):
+        for line in f:
+            if line.startswith("osu file format"):
+                version_str = line.rstrip('\n')
+                version = int(version_str.split("v")[-1])
+                if version < 5:
+                    raise InvalidModeError("Version too old")
+            while "Mode:" not in line:
+                line = f.__next__()
+            mode_str = line.rstrip('\n')
+            if mode_str.split(": ")[-1] != '3':
+                raise InvalidModeError("Not mania mode")
+            else:
+                break
 
     # Read metadata from .osu file.
-    def read_metadata(self, f, line):
-        if "[Metadata]" in line:
-            while "Source:" not in line:
-                # print(line, end="")
-                line = f.__next__()
+    def read_metadata(self, f):
+        for line in f:
+            if line.startswith("Title:"):
+                title = line.split(":")[1]
+            if line.startswith("Artist:"):
+                artist = line.split(":")[1]
+            line = f.__next__()
+            if "Source:" in line:
+                return title, artist
 
     def read_overall_difficulty(self, f, line):
         od = -1
@@ -76,7 +107,7 @@ class parser:
             # print(line, end='')
         return string_to_int(column_count)
 
-    def read_Timing_Points(self, f, line):
+    def read_Timing_Points(self, f, object_line, line):
         if "[TimingPoints]" in line:
             line = f.__next__()
             params = object_line.split(",")
