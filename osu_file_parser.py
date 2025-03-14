@@ -29,10 +29,14 @@ class parser:
         self.note_types = []
         self.title = ""
         self.artist = ""
+        self.diffname = ""
 
-    def get_title_artist(self):
+    def get_metadata(self):
         with open(self.file_path, 'r', encoding='utf-8') as f:
+            self.read_mode(f)
             self.title, self.artist = self.read_metadata(f)
+            self.diffname = self.read_difficulty_name(f)
+            return self.title, self.artist, self.diffname
 
     def process(self):
         with open(self.file_path, "r+", encoding='utf-8') as f:
@@ -54,8 +58,6 @@ class parser:
 
             except StopIteration:
                 pass
-            except InvalidModeError:
-                sys.exit()
 
     def read_mode(self, f):
         for line in f:
@@ -63,25 +65,35 @@ class parser:
                 version_str = line.rstrip('\n')
                 version = int(version_str.split("v")[-1])
                 if version < 5:
-                    raise InvalidModeError("Version too old")
+                    raise InvalidModeError(f'{self.file_path.split("\\")[-1].rstrip(".osu")} s version is too old.')
             while "Mode:" not in line:
                 line = f.__next__()
             mode_str = line.rstrip('\n')
             if mode_str.split(": ")[-1] != '3':
-                raise InvalidModeError("Not mania mode")
+                raise InvalidModeError(f'{self.file_path.split("\\")[-1].rstrip(".osu")} is not a mania map.')
             else:
                 break
 
     # Read metadata from .osu file.
     def read_metadata(self, f):
+        title = ""
+        artist = ""
         for line in f:
             if line.startswith("Title:"):
                 title = line.split(":")[1]
             if line.startswith("Artist:"):
                 artist = line.split(":")[1]
-            line = f.__next__()
-            if "Source:" in line:
+            if title and artist:
                 return title, artist
+            
+    def read_difficulty_name(self, f):
+        diffname = ""
+        for line in f:
+            while "Version:" not in line:
+                line = f.__next__()
+            if line.startswith("Version:"):
+                diffname = line.split(":")[1]
+                return diffname
 
     def read_overall_difficulty(self, f, line):
         od = -1

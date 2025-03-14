@@ -127,7 +127,7 @@ def calculate(file_path, mod, lambda_2, lambda_4, w_0, w_1, p_1, w_2, p_0):
                 max(n[2] for n in note_seq)) + 1
         
         if len(note_seq_by_column) != K:
-            raise ValueError("Number of columns does not match number of columns in note sequence")
+            raise ValueError("This map has one or more empty columns.")
 
         # === Determine Corner Times for “base” variables and for A ===
         # For Jbar, Xbar, Pbar, Rbar, C, and Ks, unsmoothed step functions change only at note boundaries.
