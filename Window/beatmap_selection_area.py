@@ -1,6 +1,8 @@
 import tkinter as tk
 import getpass
 import os
+import re
+from time import sleep
 
 class BeatmapSelectionArea(tk.Frame):
     def __init__(self, master):
@@ -19,7 +21,10 @@ class BeatmapSelectionArea(tk.Frame):
         self.canvas_area()
         self.scrollbar.bind("<Motion>", self.check_scroll)
 
+        self.search_entry()
+
         self.folders = self.generate_result()
+        self.initial_result = self.folders
         self.current_index = 0
         self.beatmap_button()
 
@@ -43,6 +48,50 @@ class BeatmapSelectionArea(tk.Frame):
 
     def _on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def search_entry(self):
+        self.substring = tk.StringVar()
+        self.substring.trace_add("write", self.callback)
+        self.searchentry = tk.Entry(self.scrollable_frame,
+                                       width=20,
+                                       font=("Arial", 12),
+                                       borderwidth=1,
+                                       relief="solid",
+                                       textvariable=self.substring,
+                                       )
+        self.searchentry.pack(side=tk.TOP, padx=10, pady=10)
+
+    def callback(self, var, index, mode):
+        sleep(1)
+        self.search_result = []
+        content = re.sub(r'[\\/*?:"<>|]', "", (self.substring.get().casefold()))
+        if content != '':
+            for folder in self.initial_result:
+                if content in folder[0].split("\\")[-1].casefold():
+                    self.search_result.append(folder)
+            
+            for widget in self.scrollable_frame.winfo_children():
+                if widget.winfo_class() != "Entry":
+                    widget.destroy()
+
+            self.current_index = 0
+
+            if self.search_result:
+                self.folders = self.search_result
+                self.load_more_buttons()
+            else:
+                # If no search results, you might want to show a message
+                no_results_label = tk.Label(self.scrollable_frame, 
+                                        text="No matching beatmaps found",
+                                        font=("Arial", 11))
+                no_results_label.pack(pady=20)
+        else:
+            for widget in self.scrollable_frame.winfo_children():
+                if widget.winfo_class() != "Entry":
+                    widget.destroy()
+            self.folders = self.initial_result  # Restore original folders
+            self.current_index = 0
+            self.load_more_buttons()
 
     def beatmap_button(self):
         if self.folders:
@@ -68,11 +117,21 @@ class BeatmapSelectionArea(tk.Frame):
         return sorted_folders
 
     def check_scroll(self, event):
-        if self.scrollbar.get()[1] > 0.9:
-            self.load_more_buttons()
+        is_end = False
+        if self.scrollbar.get()[1] > 0.95:
+            if self.current_index + 50 < len(self.folders):
+                self.current_index += 50
+            else:
+                self.current_index = len(self.folders)
+                is_end = True
+            self.load_more_buttons() if not is_end else None
+
 
     def load_more_buttons(self):
-        next_batch = self.folders[self.current_index:self.current_index + 50]
+        if self.current_index + 50 < len(self.folders):
+            next_batch = self.folders[self.current_index:self.current_index + 50]
+        else:
+            next_batch = self.folders[:self.current_index-1]
         for item in next_batch:
             self.artist_title = tk.StringVar()
             title = item[0].split('\\')[-1]
@@ -86,5 +145,4 @@ class BeatmapSelectionArea(tk.Frame):
                 textvariable=self.artist_title,
                 command=lambda x=item[0]: self.master.result_area.display(x)
                 )
-            self.beatmapbutton.pack(side=tk.TOP, fill=tk.X, pady=5)
-        self.current_index += 50
+            self.beatmapbutton.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
