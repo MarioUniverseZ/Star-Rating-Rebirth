@@ -2,7 +2,6 @@ import tkinter as tk
 import getpass
 import os
 import re
-from time import sleep
 
 class BeatmapSelectionArea(tk.Frame):
     def __init__(self, master):
@@ -23,6 +22,8 @@ class BeatmapSelectionArea(tk.Frame):
 
         self.search_entry()
 
+        self.load_beatmap_count = 0
+
         self.folders = self.generate_result()
         self.initial_result = self.folders
         self.current_index = 0
@@ -36,8 +37,6 @@ class BeatmapSelectionArea(tk.Frame):
                                       )
         self.scrollable_frame = tk.Frame(self.canvas)
 
-        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
-
         self.scrollable_frame.bind("<Configure>",
                                    lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=200)
@@ -45,9 +44,6 @@ class BeatmapSelectionArea(tk.Frame):
 
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(side="left", fill=tk.BOTH, expand=True)
-
-    def _on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def search_entry(self):
         self.substring = tk.StringVar()
@@ -62,13 +58,20 @@ class BeatmapSelectionArea(tk.Frame):
         self.searchentry.pack(side=tk.TOP, padx=10, pady=10)
 
     def callback(self, var, index, mode):
-        sleep(1)
         self.search_result = []
-        content = re.sub(r'[\\/*?:"<>|]', "", (self.substring.get().casefold()))
+        substr_casefold = self.substring.get().casefold()
+        have_metacharacters = re.search(r'[\\/*?:\"<>|]', substr_casefold)
+        content = [re.sub(r'[\\/*?:\"<>|]', "", (substr_casefold)),
+                   re.sub(r'[\\/*?:\"<>|]', "_", (substr_casefold))]
         if content != '':
             for folder in self.initial_result:
-                if content in folder[0].split("\\")[-1].casefold():
-                    self.search_result.append(folder)
+                if have_metacharacters is not None: # If there are metacharacters in the search term
+                    for content_item in content:
+                        if content_item in folder[0].split("\\")[-1].casefold():
+                            self.search_result.append(folder)
+                else:
+                    if content[0] in folder[0].split("\\")[-1].casefold():
+                        self.search_result.append(folder)
             
             for widget in self.scrollable_frame.winfo_children():
                 if widget.winfo_class() != "Entry":
@@ -119,19 +122,23 @@ class BeatmapSelectionArea(tk.Frame):
     def check_scroll(self, event):
         is_end = False
         if self.scrollbar.get()[1] > 0.95:
-            if self.current_index + 50 < len(self.folders):
-                self.current_index += 50
+            if self.load_beatmap_count < 4:
+                if self.current_index + 50 < len(self.folders):
+                    self.current_index += 50
+                else:
+                    self.current_index = len(self.folders)
+                    is_end = True
+                self.load_more_buttons() if not is_end else None
+                self.load_beatmap_count += 1
             else:
-                self.current_index = len(self.folders)
-                is_end = True
-            self.load_more_buttons() if not is_end else None
+                pass
 
 
     def load_more_buttons(self):
         if self.current_index + 50 < len(self.folders):
             next_batch = self.folders[self.current_index:self.current_index + 50]
         else:
-            next_batch = self.folders[:self.current_index-1]
+            next_batch = self.folders
         for item in next_batch:
             self.artist_title = tk.StringVar()
             title = item[0].split('\\')[-1]

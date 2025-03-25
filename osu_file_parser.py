@@ -65,12 +65,12 @@ class parser:
                 version_str = line.rstrip('\n')
                 version = int(version_str.split("v")[-1])
                 if version < 5:
-                    raise InvalidModeError(f'{self.file_path.split("\\")[-1].rstrip(".osu")} s version is too old.')
+                    raise InvalidModeError("'s version is too old.")
             while "Mode:" not in line:
                 line = f.__next__()
             mode_str = line.rstrip('\n')
             if mode_str.split(": ")[-1] != '3':
-                raise InvalidModeError(f'{self.file_path.split("\\")[-1].rstrip(".osu")} is not a mania map.')
+                raise InvalidModeError('is not a mania map.')
             else:
                 break
 

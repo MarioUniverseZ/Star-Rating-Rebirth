@@ -123,14 +123,14 @@ def calculate(file_path, mod, lambda_2, lambda_4, w_0, w_1, p_1, w_2, p_0):
         LN_seq_by_column = sorted(list(LN_dict.values()), key=lambda lst: lst[0][0])
         
         if not note_seq:
-            raise ValueError("This map has no notes.")
+            raise ValueError("has no notes.")
         
         K = p[0]
         T = max( max(n[1] for n in note_seq),
                 max(n[2] for n in note_seq)) + 1
         
         if len(note_seq_by_column) != K:
-            raise ValueError("This map has one or more empty columns.")
+            raise ValueError("has one or more empty columns.")
 
         # === Determine Corner Times for “base” variables and for A ===
         # For Jbar, Xbar, Pbar, Rbar, C, and Ks, unsmoothed step functions change only at note boundaries.
