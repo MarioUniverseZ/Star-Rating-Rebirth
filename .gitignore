@@ -1,2 +1,7 @@
 __pycache__
 Test
+font
+*.build/
+*.dist/
+*.onefile-build
+*.exe
