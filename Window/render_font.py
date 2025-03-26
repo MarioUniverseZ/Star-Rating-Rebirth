@@ -2,6 +2,9 @@
 from PIL import Image, ImageDraw, ImageFont
 from .colormap import ColorMap
 import numpy as np
+from pathlib import Path
+from io import BytesIO
+from math import floor
 
 class RenderFont:
     def __init__(self, filename, fill=(0, 0, 0)):
@@ -31,9 +34,9 @@ class RenderFont:
                 font_size = 24
             width = len(txt)*font_size
         if type(txt) is np.float64:
-            width = 165
+            width = 200
 
-        height = font_size
+        height = font_size+2
 
         font = ImageFont.truetype(font=self._file, size=font_size)
         if type(txt) is str:
@@ -42,6 +45,12 @@ class RenderFont:
             colormap = ColorMap(txt)
             r,g,b = colormap.get_difficulty_color(txt)
             self._image = Image.new(mode='RGBA', size=(width, height), color=(r,g,b))
+
+        # border-radius in self._image
+        mask = Image.new('L', (width, height), 0)
+        mask_draw = ImageDraw.Draw(mask)
+        mask_draw.rounded_rectangle((0, 0, width, height), 60, fill=255)
+        self._image.putalpha(mask)
 
         rgba_data = self._image.getdata()
         newdata = []
@@ -59,13 +68,15 @@ class RenderFont:
 
         if type_ == "normal":
             if type(txt) is np.float64:
-                if txt.item() >= 6.5:
+                star_path = Path(__file__).parents[0] / "sricon\\star.png"
+                if txt.item() > 6.5:
+                    star_path = Path(__file__).parents[0] / "sricon\\star_gold.png"
                     self._fill = (255, 217, 102)
-                    draw.text(xy=(width/2, height/2), text=f'{txt:.3f}', font=font, fill=self._fill, anchor='mm',
-                    stroke_width=1, stroke_fill=self._fill)
-                else:
-                    draw.text(xy=(width/2, height/2), text=f'{txt:.3f}', font=font, fill=self._fill, anchor='mm',
-                    stroke_width=1, stroke_fill=self._fill)
+                star_icon = Image.open(star_path)
+                star_icon = star_icon.resize((28, 28))
+                self._image.paste(star_icon, (12, 10), star_icon)
+                draw.text(xy=(50, height/2), text=f'{txt:.3f}', font=font, fill=self._fill, anchor='lm',
+                stroke_width=0.8, stroke_fill=self._fill)
             else:
                 self._fill = (0, 0, 0)
                 draw.text(xy=(0,0), text=txt, font=font, fill=self._fill, anchor='la',

@@ -20,13 +20,11 @@ class ResultArea(tk.Frame):
         self.font = RenderFont(str(fontpath))
         # self.img = ImageTk.PhotoImage(self.font.get_render(20, "1234567890"))
 
-        self.is_executed = False
-
         self.frame = tk.Frame(master,
                               width=750,
-                              height=600,
                               padx=10,
                               pady=10,
+                              borderwidth=5
                               )
         self.frame.pack_propagate(False)
         self.frame.pack(side=tk.LEFT, fill=tk.BOTH)
@@ -38,32 +36,18 @@ class ResultArea(tk.Frame):
                                 width=700,
                                 bd=5)
         self.scrollbar = tk.Scrollbar(self.frame,
-                                      orient="vertical"
+                                      orient="vertical",
+                                      command=self.canvas.yview
                                       )
 
         self.scrollable_frame = tk.Frame(self.canvas)
-        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=700)
-        self.scrollable_frame.bind("<Configure>", self._configure_scroll_region)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
-        # self.scrollbar.config(command=self.canvas.yview)
 
         # self.canvas.create_image(10, 10, image=self.img, anchor=tk.NW)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-    def _on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        
-    def _configure_scroll_region(self, event):
-        # Update scroll region when content changes
-        if self.is_executed:
-            self.canvas.configure(height = new_canvas_height,
-                                  scrollregion=self.canvas.bbox("all"))
-            self.scrollbar.configure(command=self.canvas.yview)
-            self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
     def display(self, item):
         w_0, w_1, p_1, w_2, p_0 = 0.4, 2.7, 1.5, 0.27, 1.0
@@ -84,17 +68,16 @@ class ResultArea(tk.Frame):
                     })
                     # print(file, "|", f'{result:.4f}')
                 except (InvalidModeError, SystemExit, ValueError) as e:
-                    print(e)
+                    print(file_path.split("\\")[-1].rstrip(".osu"), e)
         
         result = sorted(result, key=lambda x: x['SR'], reverse=False)
-        global new_canvas_height
-        new_canvas_height = 150 + len(result) * 80
+        new_canvas_height = len(result) * 80
+        self.canvas.configure(scrollregion=(0, 0, 0, new_canvas_height))
         self.canvas.delete("all")
         self.images = []
         for i in range(len(result)):
             img_diffname = ImageTk.PhotoImage(self.font.get_render(32, str(result[i]['diffname'])))
-            img_sr = ImageTk.PhotoImage(self.font.get_render(50, result[i]['SR']))
+            img_sr = ImageTk.PhotoImage(self.font.get_render(48, result[i]['SR']))
             self.images.extend([img_diffname, img_sr])
             self.canvas.create_image(30, 20 + i * 80, image=img_diffname, anchor=tk.NW)
             self.canvas.create_image(430, 10 + i * 80, image=img_sr, anchor=tk.NW)
-        self.is_executed = True
