@@ -6,7 +6,6 @@ import re
 class BeatmapSelectionArea(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
-
         self.frame = tk.Frame(master,
                               width=250,
                               height=600,
@@ -47,7 +46,7 @@ class BeatmapSelectionArea(tk.Frame):
 
     def search_entry(self):
         self.substring = tk.StringVar()
-        self.substring.trace_add("write", self.callback)
+        self.substring.trace_add("write", self._search_callback)
         self.searchentry = tk.Entry(self.scrollable_frame,
                                        width=20,
                                        font=("Arial", 12),
@@ -57,7 +56,7 @@ class BeatmapSelectionArea(tk.Frame):
                                        )
         self.searchentry.pack(side=tk.TOP, padx=10, pady=10)
 
-    def callback(self, var, index, mode):
+    def _search_callback(self, var, index, mode):
         self.search_result = []
         substr_casefold = self.substring.get().casefold()
         have_metacharacters = re.search(r'[\\/*?:\"<>|]', substr_casefold)
@@ -150,6 +149,7 @@ class BeatmapSelectionArea(tk.Frame):
                 font=("Arial", 11),
                 wraplength=180,
                 textvariable=self.artist_title,
-                command=lambda x=item[0]: self.master.result_area.display(x)
+                activeforeground="red",
+                command=lambda x=item[0]: self.master.result_area.display(x, self.master.game_modifier_area.get_mod())
                 )
             self.beatmapbutton.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)

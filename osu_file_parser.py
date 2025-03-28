@@ -30,13 +30,15 @@ class parser:
         self.title = ""
         self.artist = ""
         self.diffname = ""
+        self.bg = ""
 
     def get_metadata(self):
         with open(self.file_path, 'r', encoding='utf-8') as f:
             self.read_mode(f)
             self.title, self.artist = self.read_metadata(f)
             self.diffname = self.read_difficulty_name(f)
-            return self.title, self.artist, self.diffname
+            self.bg = self.read_bg(f)
+            return self.title, self.artist, self.diffname, self.bg
 
     def process(self):
         with open(self.file_path, "r+", encoding='utf-8') as f:
@@ -94,6 +96,18 @@ class parser:
             if line.startswith("Version:"):
                 diffname = line.split(":")[1]
                 return diffname
+            
+    def read_bg(self, f):
+        bg = ""
+        for line in f:
+            while "0,0," not in line:
+                line = f.__next__()
+                if line.startswith("0,0,"):
+                    text = line.split(",")[2]
+                    bg = text.split(",")[0].replace('"', '')
+                    return bg
+                if line.startswith("[HitObjects]"):
+                    return
 
     def read_overall_difficulty(self, f, line):
         od = -1
