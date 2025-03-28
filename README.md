@@ -1,7 +1,7 @@
 # SR-Rebirth-GUI
 originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)(2025-03-04 version)<br>
-(Yes, this interface design comes from Mapset Verifier and Huggy's Spread Wizard)
-![image](https://github.com/user-attachments/assets/fa379138-b1d7-4a32-9ff9-087b3106de8d)
+(Yes, this UI design comes from Mapset Verifier and Huggy's Spread Wizard)
+![image](https://github.com/user-attachments/assets/f44d8f69-26ad-42ee-afe9-509217eb5ef0)
 
 ## Development
 - Make sure you have Python 3.12 installed
@@ -9,7 +9,7 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 - Download TorusNotched-Regular.ttf and put in ./Window/font (I don't provide one though)
 - Install packages
     ```
-    pip install matplotlib scipy Pillow numpy pandas pyglet
+    pip install matplotlib scipy Pillow numpy pandas pyglet pywin32
     ```
 - run/debug main.py
 
@@ -17,4 +17,4 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 - [ ] Fix issues
 - [ ] Better decoration
 - [ ] Multi-calculating SR ot once
-- [ ] Toggling Double Time or Half Time
+- [x] Toggling Double Time or Half Time
