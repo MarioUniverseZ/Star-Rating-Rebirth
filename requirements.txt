@@ -1,0 +1,7 @@
+matplotlib
+scipy
+Pillow
+numpy
+pandas
+pyglet
+pywin32

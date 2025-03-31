@@ -9,7 +9,7 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 - Download TorusNotched-Regular.ttf and put in ./Window/font (I don't provide one though)
 - Install packages
     ```
-    pip install matplotlib scipy Pillow numpy pandas pyglet pywin32
+    pip install -r requirements.txt
     ```
 - run/debug main.py
 
