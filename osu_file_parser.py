@@ -94,7 +94,7 @@ class parser:
             while "Version:" not in line:
                 line = f.__next__()
             if line.startswith("Version:"):
-                diffname = line.split(":")[1]
+                diffname = line.split(":", 1)[1]
                 return diffname
             
     def read_bg(self, f):
