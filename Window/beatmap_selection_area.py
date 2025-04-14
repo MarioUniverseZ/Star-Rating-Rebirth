@@ -26,6 +26,9 @@ class BeatmapSelectionArea(tk.Frame):
         self.folders = self.generate_result()
         self.initial_result = self.folders
         self.current_index = 0
+
+        self.current_selected_button = None
+        self.beatmap_buttons = []
         self.beatmap_button()
 
     def canvas_area(self):
@@ -57,6 +60,8 @@ class BeatmapSelectionArea(tk.Frame):
         self.searchentry.pack(side=tk.TOP, padx=10, pady=10)
 
     def _search_callback(self, var, index, mode):
+        self.load_beatmap_count = 0
+        self.beatmap_buttons = []
         self.search_result = []
         substr_casefold = self.substring.get().casefold()
         have_metacharacters = re.search(r'[\\/*?:\"<>|]', substr_casefold)
@@ -137,7 +142,7 @@ class BeatmapSelectionArea(tk.Frame):
         if self.current_index + 50 < len(self.folders):
             next_batch = self.folders[self.current_index:self.current_index + 50]
         else:
-            next_batch = self.folders
+            next_batch = self.folders[self.current_index:]
         for item in next_batch:
             self.artist_title = tk.StringVar()
             title = item[0].split('\\')[-1]
@@ -149,7 +154,22 @@ class BeatmapSelectionArea(tk.Frame):
                 font=("Arial", 11),
                 wraplength=180,
                 textvariable=self.artist_title,
-                activeforeground="red",
-                command=lambda x=item[0]: self.master.result_area.display(x, self.master.game_modifier_area.get_mod())
+                activeforeground="red"
                 )
+            self.beatmapbutton.config(
+                command=lambda x=item[0], btn=self.beatmapbutton: [self.master.result_area.display(x, self.master.game_modifier_area.get_mod()), self.button_onclick(btn)]
+            )
             self.beatmapbutton.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+            self.beatmap_buttons.append(self.beatmapbutton)
+
+    def button_onclick(self, clicked_button: tk.Button):
+        self.current_selected_button = clicked_button
+        for other_button in self.beatmap_buttons:
+            other_button.configure(
+                bg="SystemButtonFace",
+                fg="black"
+                )
+        if self.current_selected_button:
+            self.current_selected_button.configure(
+                bg="#727", fg="SystemButtonFace"
+                )

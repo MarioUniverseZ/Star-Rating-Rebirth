@@ -30,6 +30,11 @@ class ResultArea(tk.Frame):
 
         self.canvas_area()
 
+        self.previous_item = None
+        self.current_item = None
+        self.previous_mod = None
+        self.current_mod = None
+
     def canvas_area(self):
         # canvas container
         self.canvas_container = tk.Frame(self.frame)
@@ -72,65 +77,97 @@ class ResultArea(tk.Frame):
         self.canvas.place(x=0, y=-1, relwidth=1, relheight=1)
 
     def display(self, item, mod):
-        w_0, w_1, p_1, w_2, p_0 = 0.4, 2.7, 1.5, 0.27, 1.0
+        from .main_window import remove_resultbackup
 
-        result = []
-        background = []
-        osu_count = 0
-        for file in os.listdir(item):
-            if file.endswith('.osu'):
-                try:
-                    osu_count += 1
-                    file_path = os.path.join(item, file)
-                    metadata = parser(file_path)
-                    title, artist, diffname, bg = metadata.get_metadata()
-                    sr = calculate(file_path, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
-                    result.append({
-                        "title": title,
-                        "artist": artist,
-                        "diffname": diffname,
-                        "SR": sr
-                    })
-                    background.append(f'{item}\\{bg}')
-                    # print(file, "|", f'{result:.4f}')
-                except (InvalidModeError, SystemExit, ValueError) as e:
-                    print(file_path.split("\\")[-1].rstrip(".osu"), e)
-        
-        if osu_count == 0:
-            print("No osu file found in the folder")
+        if self.current_item:
+            self.previous_item = self.current_item
+        if self.current_mod:
+            self.previous_mod = self.current_mod
+        self.current_item = item
+        self.current_mod = mod
 
-        result = sorted(result, key=lambda x: x['SR'], reverse=False)
-        background = list(set(background))
+        same_item = bool(self.previous_item == self.current_item)
+        previous_moditem = os.path.isfile(f'resultbackup_{mod}.png')
+        condition = bool(same_item and previous_moditem)
 
-        new_canvas_height = len(result) * 65 + 15
+        # calculate only when the item is changed or all mods are not calculated
+        if not condition:
+            if not same_item:
+                remove_resultbackup()
+            w_0, w_1, p_1, w_2, p_0 = 0.4, 2.7, 1.5, 0.27, 1.0
 
-        self.canvas.configure(scrollregion=(0, 0, 0, new_canvas_height))
-        self.canvas.delete("all")
+            result = []
+            background = []
+            osu_count = 0
+            for file in os.listdir(item):
+                if file.endswith('.osu'):
+                    try:
+                        osu_count += 1
+                        file_path = os.path.join(item, file)
+                        metadata = parser(file_path)
+                        title, artist, diffname, bg = metadata.get_metadata()
+                        sr = calculate(file_path, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
+                        result.append({
+                            "title": title,
+                            "artist": artist,
+                            "diffname": diffname,
+                            "SR": sr
+                        })
+                        background.append(f'{item}\\{bg}')
+                        # print(file, "|", f'{result:.4f}')
+                    except (InvalidModeError, SystemExit, ValueError) as e:
+                        print(file_path.split("\\")[-1].rstrip(".osu"), e)
+            
+            if osu_count == 0:
+                print("No osu file found in the folder")
 
-        for item in background:
-            if item.split("\\")[-1] == "None":
-                background.remove(item)
-        
-        if background:
-            self.choice = random.choice(background)
-            self.bg_candidate = Image.open(self.choice)
-            width, height = self.bg_candidate.size
-            ratio = width / height
-            if ratio >= 1:
-                self.bg_candidate = self.bg_candidate.resize((int(750*ratio), 750))
+            result = sorted(result, key=lambda x: x['SR'], reverse=False)
+            background = list(set(background))
+
+            new_canvas_height = len(result) * 65 + 15
+
+            self.canvas.configure(scrollregion=(0, 0, 0, new_canvas_height))
+            self.canvas.delete("all")
+
+            for item in background:
+                if item.split("\\")[-1] == "None":
+                    background.remove(item)
+            
+            if background:
+                self.choice = random.choice(background)
+                self.bg_candidate = Image.open(self.choice)
+                width, height = self.bg_candidate.size
+                ratio = width / height
+                if ratio >= 1:
+                    self.bg_candidate = self.bg_candidate.resize((int(750*ratio), 750))
+                else:
+                    self.bg_candidate = self.bg_candidate.resize((750, int(750/ratio)))
+                self.bg_candidate.putalpha(111)
+                self.bg_candidate = self.bg_candidate.filter(ImageFilter.BLUR)
+                self.bg_candidate = ImageTk.PhotoImage(self.bg_candidate)
+                self.bg_canvas.create_image(356, 290, image=self.bg_candidate, anchor=tk.CENTER)
             else:
-                self.bg_candidate = self.bg_candidate.resize((750, int(750/ratio)))
-            self.bg_candidate.putalpha(111)
-            self.bg_candidate = self.bg_candidate.filter(ImageFilter.BLUR)
-            self.bg_candidate = ImageTk.PhotoImage(self.bg_candidate)
-            self.bg_canvas.create_image(356, 290, image=self.bg_candidate, anchor=tk.CENTER)
-        else:
-            self.bg_canvas.delete("all")
+                self.bg_canvas.delete("all")
 
-        self.images = []
-        for i in range(len(result)):
-            img_diffname = ImageTk.PhotoImage(self.font.get_render(32, str(result[i]['diffname'])))
-            img_sr = ImageTk.PhotoImage(self.font.get_render(48, result[i]['SR']))
-            self.images.extend([img_diffname, img_sr])
-            self.canvas.create_image(50, 22 + i * 65, image=img_diffname, anchor=tk.NW)
-            self.canvas.create_image(450, 15 + i * 65, image=img_sr, anchor=tk.NW)
+            self.images = []
+            self.img_backup = Image.new("RGBA", (700, new_canvas_height))
+            for i in range(len(result)):
+                img_diffname = ImageTk.PhotoImage(self.font.get_render(32, str(result[i]['diffname'])))
+                img_sr = ImageTk.PhotoImage(self.font.get_render(48, result[i]['SR']))
+                self.images.extend([img_diffname, img_sr])
+                self.canvas.create_image(50, 22 + i * 65, image=img_diffname, anchor=tk.NW)
+                self.img_backup.paste(ImageTk.getimage(img_diffname), (50, 22 + i * 65))
+                self.canvas.create_image(450, 15 + i * 65, image=img_sr, anchor=tk.NW)
+                self.img_backup.paste(ImageTk.getimage(img_sr), (450, 15 + i * 65))
+
+            self.img_backup.save(f'{Path(__file__).parent.parent}\\resultbackup_{mod}.png')
+
+        else:
+            self.canvas.delete("all") # prevent different sort order across mods
+            self.backup = []
+            img = Image.open(f'resultbackup_{mod}.png')
+            new_canvas_height = img.height
+            self.canvas.configure(scrollregion=(0, 0, 0, new_canvas_height))
+            tk_img = ImageTk.PhotoImage(img)
+            self.backup.extend([tk_img])
+            self.canvas.create_image(0, 0, image=tk_img, anchor=tk.NW)

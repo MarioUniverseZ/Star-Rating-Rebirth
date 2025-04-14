@@ -80,5 +80,5 @@ class RenderFont:
             else:
                 self._fill = (0, 0, 0)
                 draw.text(xy=(5,2), text=txt, font=font, fill='white', anchor='la',
-                stroke_width=4.5, stroke_fill=self._fill)
+                stroke_width=5, stroke_fill=self._fill)
         return self._image

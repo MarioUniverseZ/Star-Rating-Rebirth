@@ -1,6 +1,6 @@
 matplotlib
 scipy
-Pillow
+Pillow==10.4.0
 numpy
 pandas
 pyglet
