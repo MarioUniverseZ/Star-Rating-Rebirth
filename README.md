@@ -4,14 +4,14 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 ![image](https://github.com/user-attachments/assets/f44d8f69-26ad-42ee-afe9-509217eb5ef0)
 
 ## Development
-- Make sure you have Python 3.12 installed
-- Clone this repo
-- Download TorusNotched-Regular.ttf and put in ./Window/font (I don't provide one though)
-- Install packages
+1. Make sure you have Windows environment and Python 3.12 installed
+2. Clone this repo
+3. Get TorusNotched-Regular.ttf and put it in ./Window/font (I don't provide one though)
+4. Install packages
     ```
     pip install -r requirements.txt
     ```
-- run/debug main.py
+5. run/debug main.py
 
 ## Future Plan
 - [ ] Fix issues
