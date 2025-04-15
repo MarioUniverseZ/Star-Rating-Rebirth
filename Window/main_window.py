@@ -1,12 +1,17 @@
 import tkinter as tk
 import os
 import glob
+from pathlib import Path
 from .beatmap_selection_area import BeatmapSelectionArea
 from .result_area import ResultArea
 from .game_modifier_area import GameModifierArea
 
+def get_resultbackup_path():
+    return str(Path(__file__).parents[0] / "resultbackup")
+
 def remove_resultbackup():
-    resultbackup = glob.glob("resultbackup_*.png")
+    result_path = get_resultbackup_path()
+    resultbackup = glob.glob(f"{result_path}\\resultbackup_*.png")
     for item in resultbackup:
         os.remove(item)
 

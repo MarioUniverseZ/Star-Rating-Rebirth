@@ -77,7 +77,8 @@ class ResultArea(tk.Frame):
         self.canvas.place(x=0, y=-1, relwidth=1, relheight=1)
 
     def display(self, item, mod):
-        from .main_window import remove_resultbackup
+        from .main_window import remove_resultbackup, get_resultbackup_path
+        result_path = get_resultbackup_path()
 
         if self.current_item:
             self.previous_item = self.current_item
@@ -87,7 +88,7 @@ class ResultArea(tk.Frame):
         self.current_mod = mod
 
         same_item = bool(self.previous_item == self.current_item)
-        previous_moditem = os.path.isfile(f'resultbackup_{mod}.png')
+        previous_moditem = os.path.isfile(f'{result_path}\\resultbackup_{mod}.png')
         condition = bool(same_item and previous_moditem)
 
         # calculate only when the item is changed or all mods are not calculated
@@ -160,12 +161,12 @@ class ResultArea(tk.Frame):
                 self.canvas.create_image(450, 15 + i * 65, image=img_sr, anchor=tk.NW)
                 self.img_backup.paste(ImageTk.getimage(img_sr), (450, 15 + i * 65))
 
-            self.img_backup.save(f'{Path(__file__).parent.parent}\\resultbackup_{mod}.png')
+            self.img_backup.save(f'{result_path}\\resultbackup_{mod}.png')
 
         else:
             self.canvas.delete("all") # prevent different sort order across mods
             self.backup = []
-            img = Image.open(f'resultbackup_{mod}.png')
+            img = Image.open(f'{result_path}\\resultbackup_{mod}.png')
             new_canvas_height = img.height
             self.canvas.configure(scrollregion=(0, 0, 0, new_canvas_height))
             tk_img = ImageTk.PhotoImage(img)

@@ -5,4 +5,4 @@ font
 *.dist/
 *.onefile-build
 *.exe
-resultbackup_*.png
+resultbackup/
