@@ -27,6 +27,9 @@ class Window(tk.Tk):
         self.game_modifier_area = GameModifierArea(self)
         self.result_area = ResultArea(self)
 
+        result_path = get_resultbackup_path()
+        os.makedirs(result_path, exist_ok=True)
+
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def on_closing(self):
