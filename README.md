@@ -16,5 +16,5 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 ## Future Plan
 - [ ] Fix issues
 - [ ] Better decoration
-- [ ] Multi-calculating SR ot once
+- [ ] Multi-calculating SR at once
 - [x] Toggling Double Time or Half Time

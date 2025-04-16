@@ -3,13 +3,11 @@ import win32gui, win32con, win32api
 import random
 import pyglet
 import os
-import sys
-sys.path.append("..")
-from osu_file_parser import parser, InvalidModeError
-from algorithm import calculate
 from pathlib import Path
 from .render_font import RenderFont
+from .result_process import ResultProcess
 from PIL import ImageTk, Image, ImageFilter
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 class ResultArea(tk.Frame):
     def __init__(self, master):
@@ -75,7 +73,7 @@ class ResultArea(tk.Frame):
 
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.place(x=0, y=-1, relwidth=1, relheight=1)
-
+    
     def display(self, item, mod):
         from .main_window import remove_resultbackup, get_resultbackup_path
         result_path = get_resultbackup_path()
@@ -95,35 +93,30 @@ class ResultArea(tk.Frame):
         if not condition:
             if not same_item:
                 remove_resultbackup()
-            w_0, w_1, p_1, w_2, p_0 = 0.4, 2.7, 1.5, 0.27, 1.0
-
-            result = []
-            background = []
-            osu_count = 0
-            for file in os.listdir(item):
-                if file.endswith('.osu'):
-                    try:
-                        osu_count += 1
-                        file_path = os.path.join(item, file)
-                        metadata = parser(file_path)
-                        title, artist, diffname, bg = metadata.get_metadata()
-                        sr = calculate(file_path, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
-                        result.append({
-                            "title": title,
-                            "artist": artist,
-                            "diffname": diffname,
-                            "SR": sr
-                        })
-                        background.append(f'{item}\\{bg}')
-                        # print(file, "|", f'{result:.4f}')
-                    except (InvalidModeError, SystemExit, ValueError) as e:
-                        print(file_path.split("\\")[-1].rstrip(".osu"), e)
             
-            if osu_count == 0:
-                print("No osu file found in the folder")
+            rp = ResultProcess
+            files = os.listdir(item)
+            cpu_count = os.cpu_count()
+            results = []
+            backgrounds = []
+            with ProcessPoolExecutor() as executor:
+                chunk_size = 1 if len(files) <= cpu_count else len(files) // cpu_count
+                futures = [executor.submit(rp._resultprocess, rp, item, files[i:i+chunk_size], mod) for i in range(0, len(files), chunk_size)]
+                for future in as_completed(futures):
+                    result, background = future.result()
+                    results.append(result)
+                    backgrounds.append(background)
 
-            result = sorted(result, key=lambda x: x['SR'], reverse=False)
-            background = list(set(background))
+                if not results:
+                    print("No osu files found in the folder")
+
+            results = [x for x in results if x != []]
+            results = [x for xs in results for x in xs]
+            backgrounds = [x for x in backgrounds if x != []]
+            backgrounds = [x for xs in backgrounds for x in xs]
+            
+            result = sorted(results, key=lambda x: x['SR'], reverse=False)
+            background = list(set(backgrounds)) if backgrounds else []
 
             new_canvas_height = len(result) * 65 + 15
 

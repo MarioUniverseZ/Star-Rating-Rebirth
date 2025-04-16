@@ -137,7 +137,6 @@ class BeatmapSelectionArea(tk.Frame):
             else:
                 pass
 
-
     def load_more_buttons(self):
         if self.current_index + 50 < len(self.folders):
             next_batch = self.folders[self.current_index:self.current_index + 50]

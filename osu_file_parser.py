@@ -159,22 +159,23 @@ class parser:
     # If note_end is 0, the note is a single note, otherwise a hold.
     def parse_hit_object(self, f, object_line, column_count):
         params = object_line.split(",")
-        column = string_to_int((params[0]))
-        column_width = int(512 / column_count)
-        column = int(column / column_width)
-        collect_data(self.columns, column)
+        if params[0] != "\n":
+            column = string_to_int((params[0]))
+            column_width = int(512 / column_count)
+            column = int(column / column_width)
+            collect_data(self.columns, column)
 
-        note_start = int(params[2])
-        collect_data(self.note_starts, note_start)
+            note_start = int(params[2])
+            collect_data(self.note_starts, note_start)
 
-        # 1: single note
-        # 128: Hold(LN)
-        note_type = int(params[3])
-        collect_data(self.note_types, note_type)
+            # 1: single note
+            # 128: Hold(LN)
+            note_type = int(params[3])
+            collect_data(self.note_types, note_type)
 
-        last_param_chunk = params[5].split(":")
-        note_end = int(last_param_chunk[0])
-        collect_data(self.note_ends, note_end)
+            last_param_chunk = params[5].split(":")
+            note_end = int(last_param_chunk[0])
+            collect_data(self.note_ends, note_end)
 
     def get_parsed_data(self):
         return [self.column_count,
