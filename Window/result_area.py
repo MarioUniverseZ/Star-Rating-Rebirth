@@ -107,7 +107,11 @@ class ResultArea(tk.Frame):
                     results.append(result)
                     backgrounds.append(background)
 
-                if not results:
+                osu_count = 0
+                for result in results:
+                    if result:
+                        osu_count += len(result)
+                if osu_count == 0:
                     print("No osu files found in the folder")
 
             results = [x for x in results if x != []]
@@ -129,7 +133,7 @@ class ResultArea(tk.Frame):
             
             if background:
                 self.choice = random.choice(background)
-                self.bg_candidate = Image.open(self.choice)
+                self.bg_candidate = Image.open(self.choice).convert("RGB")
                 width, height = self.bg_candidate.size
                 ratio = width / height
                 if ratio >= 1:
