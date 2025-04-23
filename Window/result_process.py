@@ -9,27 +9,13 @@ class ResultProcess:
     def __init__(self):
         self.__init__(self)
 
-    def _resultprocess(self, item, file, mod):
+    def _resultprocess(self, item, file, mod, result: list):
         w_0, w_1, p_1, w_2, p_0 = 0.4, 2.7, 1.5, 0.27, 1.0
 
-        result = []
-        background = []
         parent_path = item
-        for content in file:
-            if content.endswith('.osu'):
-                try:
-                    file_path = os.path.join(parent_path, content)
-                    metadata = parser(file_path)
-                    title, artist, diffname, bg = metadata.get_metadata()
-                    sr = calculate(file_path, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
-                    result.append({
-                                "title": title,
-                                "artist": artist,
-                                "diffname": diffname,
-                                "SR": sr
-                    })
-                    background.append(f'{parent_path}\\{bg}')
-                except (InvalidModeError, SystemExit, ValueError) as e:
-                    print(file_path.split("\\")[-1].rstrip(".osu"), e)
+        for content_index in range(len(file)):
+            file_path = os.path.join(parent_path, file[content_index])
+            sr = calculate(file_path, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
+            result[content_index]['SR'] = sr
 
-        return result, background
+        return result

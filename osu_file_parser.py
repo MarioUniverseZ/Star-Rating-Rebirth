@@ -37,8 +37,9 @@ class parser:
             self.read_mode(f)
             self.title, self.artist = self.read_metadata(f)
             self.diffname = self.read_difficulty_name(f)
+            self.keymode = self.read_keymode(f)
             self.bg = self.read_bg(f)
-            return self.title, self.artist, self.diffname, self.bg
+            return self.title, self.artist, self.diffname, self.keymode, self.bg
 
     def process(self):
         with open(self.file_path, "r+", encoding='utf-8') as f:
@@ -96,6 +97,15 @@ class parser:
             if line.startswith("Version:"):
                 diffname = line.split(":", 1)[1]
                 return diffname
+            
+    def read_keymode(self, f):
+        keymode = ""
+        for line in f:
+            while "CircleSize:" not in line:
+                line = f.__next__()
+            if line.startswith("CircleSize:"):
+                keymode = line.split(":")[1]
+                return keymode
             
     def read_bg(self, f):
         bg = ""

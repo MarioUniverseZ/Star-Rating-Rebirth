@@ -79,6 +79,10 @@ class RenderFont:
                 stroke_width=1, stroke_fill=self._fill)
             else:
                 self._fill = (0, 0, 0)
-                draw.text(xy=(5,2), text=txt, font=font, fill='white', anchor='la',
-                stroke_width=5, stroke_fill=self._fill)
+                if font_size > 26:
+                    draw.text(xy=(5,2), text=txt, font=font, fill='white', anchor='la',
+                    stroke_width=5, stroke_fill=self._fill)
+                else:
+                    draw.text(xy=(5,5), text=txt, font=font, fill='white', anchor='la',
+                    stroke_width=5, stroke_fill=self._fill)
         return self._image
