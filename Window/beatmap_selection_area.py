@@ -2,6 +2,8 @@ import tkinter as tk
 import getpass
 import os
 import re
+from tkinter import filedialog, messagebox
+from configparser import ConfigParser
 
 class BeatmapSelectionArea(tk.Frame):
     def __init__(self, master):
@@ -105,14 +107,33 @@ class BeatmapSelectionArea(tk.Frame):
             self.load_more_buttons()
 
     def generate_result(self):
-        osu_root = os.getenv("LOCALAPPDATA")
-        with open (f'{osu_root}\\osu!\\osu!.{getpass.getuser()}.cfg', 'r', encoding='utf8') as f:
+        self.config = ConfigParser()
+        has_ini = self.config.read('config.ini')
+        self.path = self.config.get('General', 'osu_path') if has_ini else ''
+        # locate the osu! folder first
+        osu_root = self.config.get('General', 'osu_path')
+        if not self.path:
+            with open('config.ini', 'w') as configfile:
+                self.config.add_section('General')
+                self.config.set('General', 'osu_path', '')
+                self.config.write(configfile)
+            osu_root = filedialog.askdirectory(title="Select your osu! folder")
+        while not osu_root:
+            messagebox.showerror("Error", "Please select your osu! folder")
+            osu_root = filedialog.askdirectory(title="Select your osu! folder")
+        self.config['General']['osu_path'] = osu_root
+        with open('config.ini', 'w') as configfile:
+            self.config.write(configfile)
+        # Get the beatmap folder path from the osu! config file
+        with open (f'{osu_root}\\osu!.{getpass.getuser()}.cfg', 'r', encoding='utf8') as f:
             cfg = f.readlines()
             for line in cfg:
                 if line.startswith('BeatmapDirectory'):
                     folder_path = line.split('=')[1].strip()
                     break
         # Get all subfolders with their modification times
+        if '\\' not in folder_path:
+            folder_path = f'{osu_root}\\{folder_path}'
         subfolders = []
         for entry in os.scandir(folder_path):
             if entry.is_dir():

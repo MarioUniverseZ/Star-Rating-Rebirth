@@ -13,7 +13,16 @@ class GameModifierArea(tk.Frame):
         self.frame.pack(side=tk.LEFT, fill=tk.BOTH)
 
         self.modstr = tk.StringVar()
+        self.mappage = tk.StringVar()
         self.button_area()
+        self.map_area()
+
+    def map_area(self):
+        self.map_label = tk.Label(self.frame,
+                                  textvariable=self.mappage,
+                                  font=("Arial", 12),
+                                  )
+        self.map_label.pack(side=tk.LEFT, padx=10)
 
     def button_area(self):
         ht_path = Path(__file__).parents[0] / "icon\\game_modifier\\HT.png"

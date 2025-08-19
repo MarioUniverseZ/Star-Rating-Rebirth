@@ -37,9 +37,10 @@ class parser:
             self.read_mode(f)
             self.title, self.artist = self.read_metadata(f)
             self.diffname = self.read_difficulty_name(f)
+            self.beatmapset_id = self.read_beatmapset_id(f)
             self.keymode = self.read_keymode(f)
             self.bg = self.read_bg(f)
-            return self.title, self.artist, self.diffname, self.keymode, self.bg
+            return self.title, self.artist, self.diffname, self.beatmapset_id, self.keymode, self.bg
 
     def process(self):
         with open(self.file_path, "r+", encoding='utf-8') as f:
@@ -97,6 +98,15 @@ class parser:
             if line.startswith("Version:"):
                 diffname = line.split(":", 1)[1]
                 return diffname
+            
+    def read_beatmapset_id(self, f):
+        beatmapset_id = ""
+        for line in f:
+            while "BeatmapSetID:" not in line:
+                line = f.__next__()
+            if line.startswith("BeatmapSetID:"):
+                beatmapset_id = line.split(":")[1]
+                return beatmapset_id.rstrip("\n")
             
     def read_keymode(self, f):
         keymode = ""

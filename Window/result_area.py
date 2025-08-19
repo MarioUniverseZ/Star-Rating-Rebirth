@@ -3,6 +3,7 @@ import win32gui, win32con, win32api
 import random
 import pyglet
 import os
+import webbrowser
 from pathlib import Path
 from .render_font import RenderFont
 from .result_process import ResultProcess
@@ -35,6 +36,8 @@ class ResultArea(tk.Frame):
         self.current_item = None
         self.previous_mod = None
         self.current_mod = None
+
+        self.status = None
 
     def canvas_area(self):
         # canvas container
@@ -113,7 +116,7 @@ class ResultArea(tk.Frame):
                 try:
                     file_path = os.path.join(item, map)
                     metadata = parser(file_path)
-                    title, artist, diffname, keymode, bg = metadata.get_metadata()
+                    title, artist, diffname, beatmapset_id, keymode, bg = metadata.get_metadata()
                     keymode = int(keymode)
                     if f'{keymode}k' not in diffname.casefold():
                         diffname = f'[{keymode}K] {diffname}'
@@ -121,7 +124,8 @@ class ResultArea(tk.Frame):
                         'keymode': keymode,
                         'title': title,
                         'artist': artist,
-                        'diffname': diffname
+                        'diffname': diffname,
+                        'beatmapset_id': beatmapset_id,
                     })
                     backgrounds.append(f'{item}\\{bg}')
                     valid_maps.append(map)
@@ -206,3 +210,14 @@ class ResultArea(tk.Frame):
             tk_img = ImageTk.PhotoImage(img)
             self.backup.extend([tk_img])
             self.canvas.create_image(0, 0, image=tk_img, anchor=tk.NW)
+
+        try:
+            if beatmapset_id != -1:
+                url = f'https://osu.ppy.sh/beatmapsets/{beatmapset_id}'
+                self.master.game_modifier_area.mappage.set(beatmapset_id)
+                self.master.game_modifier_area.map_label.bind("<Button-1>", lambda e,url=url:webbrowser.open(url))
+            else:
+                self.master.game_modifier_area.mappage.set('')
+                self.master.game_modifier_area.map_label.unbind("<Button-1>")
+        except UnboundLocalError:
+            pass

@@ -1,8 +1,10 @@
 __pycache__
 Test
 font
+.env
 *.build/
 *.dist/
 *.onefile-build
 *.exe
+config.ini
 resultbackup/
