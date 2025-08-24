@@ -109,9 +109,9 @@ class BeatmapSelectionArea(tk.Frame):
     def generate_result(self):
         self.config = ConfigParser()
         has_ini = self.config.read('config.ini')
-        self.path = self.config.get('General', 'osu_path') if has_ini else ''
+        self.path = self.config.get('General', 'osu_path') if has_ini else None
         # locate the osu! folder first
-        osu_root = self.config.get('General', 'osu_path')
+        osu_root = self.path
         if not self.path:
             with open('config.ini', 'w') as configfile:
                 self.config.add_section('General')

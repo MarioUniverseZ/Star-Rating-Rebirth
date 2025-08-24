@@ -2,9 +2,11 @@ __pycache__
 Test
 font
 .env
+.venv/
 *.build/
 *.dist/
 *.onefile-build
 *.exe
 config.ini
+nuitka_compile.bat
 resultbackup/
