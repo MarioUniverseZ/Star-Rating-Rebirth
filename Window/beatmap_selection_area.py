@@ -3,7 +3,7 @@ import getpass
 import os
 import re
 from tkinter import filedialog, messagebox
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError
 
 class BeatmapSelectionArea(tk.Frame):
     def __init__(self, master):
@@ -109,7 +109,11 @@ class BeatmapSelectionArea(tk.Frame):
     def generate_result(self):
         self.config = ConfigParser()
         has_ini = self.config.read('config.ini')
-        self.path = self.config.get('General', 'osu_path') if has_ini else None
+        try:
+            self.path = self.config.get('General', 'osu_path') if has_ini else None
+        except NoSectionError:
+            self.path = None
+
         # locate the osu! folder first
         osu_root = self.path
         if not self.path:

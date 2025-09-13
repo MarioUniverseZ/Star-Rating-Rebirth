@@ -1,23 +1,30 @@
-[tool.poetry]
-name = "star-rating-rebirth"
-version = "0.1.0"
-description = ""
-authors = ["U1d <u1dric3@gmail.com>"]
+[project]
+name = "sr-rebirth-gui"
+version = "0.1.6"
+description = "sunnyxxy's osumania SR algorithm gets implemented in a GUI"
+authors = [
+    {name = "MarioUniverseZ",email = "118989308+MarioUniverseZ@users.noreply.github.com"}
+]
 readme = "README.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "matplotlib (>=3.10.1,<4.0.0)",
+    "scipy (>=1.15.2,<2.0.0)",
+    "Pillow (>=10.4.0,<11.0.0)",
+    "numpy (>=2.2.3,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "pyglet (>=2.1.3,<3.0.0)",
+    "pywin32 (>=308,<309)"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<3.14"
-pandas = "^2.2.3"
-
-
-[tool.poetry.group.dev.dependencies]
-matplotlib = "^3.10.0"
-jupyter = "^1.1.1"
-
-
-[tool.poetry.group.pyinstaller.dependencies]
-pyinstaller = "^6.11.1"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.15.0"
+nuitka = "^2.7.14"
+

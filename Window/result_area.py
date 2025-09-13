@@ -4,9 +4,9 @@ import random
 import pyglet
 import os
 import webbrowser
-from pathlib import Path
 from .render_font import RenderFont
 from .result_process import ResultProcess
+from .window_func import get_resource_path
 from PIL import ImageTk, Image, ImageFilter
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import sys
@@ -18,7 +18,7 @@ class ResultArea(tk.Frame):
         super().__init__(master)
 
         pyglet.options['win32_gdi_font'] = True
-        fontpath = Path(__file__).parents[0] / "font\\TorusNotched-Regular.ttf"
+        fontpath = get_resource_path("Window\\font\\TorusNotched-Regular.ttf")
         pyglet.font.add_file(str(fontpath))
         self.font = RenderFont(str(fontpath))
 
@@ -81,7 +81,7 @@ class ResultArea(tk.Frame):
         self.canvas.place(x=0, y=-1, relwidth=1, relheight=1)
     
     def display(self, item, mod):
-        from .main_window import remove_resultbackup, get_resultbackup_path
+        from .window_func import remove_resultbackup, get_resultbackup_path
         result_path = get_resultbackup_path()
 
         if self.current_item:
@@ -129,7 +129,7 @@ class ResultArea(tk.Frame):
                     })
                     backgrounds.append(f'{item}\\{bg}')
                     valid_maps.append(map)
-                except (InvalidModeError, SystemExit, ValueError) as e:
+                except (InvalidModeError) as e:
                     print(map.split("\\")[-1].rstrip(".osu"), e)
             maps = valid_maps
 
@@ -143,7 +143,7 @@ class ResultArea(tk.Frame):
                             try:
                                 processed_results += future.result()
                             except ValueError as e:
-                                print(map.split("\\")[-1].rstrip(".osu"), e)
+                                print(e)
                                 continue
                         results = processed_results if processed_results else results
                 elif len(maps) == 1:
@@ -151,12 +151,12 @@ class ResultArea(tk.Frame):
                         result = rp._resultprocess(rp, item, maps, mod, results)
                         processed_results = result
                     except ValueError as e:
-                        print(map.split("\\")[-1].rstrip(".osu"), e)
+                        print(e)
                     results = processed_results if processed_results else results
                 else:
                     print("No mania maps found in the folder")
             except Exception as e:
-                print(map.split("\\")[-1].rstrip(".osu"), e)
+                print(e)
             
             try:
                 result = sorted(results, key=lambda x: (x['keymode'], x['SR']), reverse=False)

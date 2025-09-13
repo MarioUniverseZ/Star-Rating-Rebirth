@@ -1,12 +1,22 @@
+# Compiled Python files
 __pycache__
+
+# Unused folders
 Test
 font
+
+# Environment files
 .env
+config.ini
 .venv/
-*.build/
-*.dist/
+
+# Build files (Pyinstaller/Nuitka)
+*build/
+*dist/
 *.onefile-build
 *.exe
-config.ini
-nuitka_compile.bat
+*.bat
+*.spec
+
+# Backup files (intended to ignore)
 resultbackup/

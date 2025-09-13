@@ -6,13 +6,13 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 ## Notes
 - You will be asked for your beatmap directory for the first time when you run the program
 
-## Development
-1. Make sure you have Windows environment and Python 3.12 installed
-2. Clone this repo
+## Development(Windows Only)
+1. Clone this repo
+2. Install [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
 3. Get TorusNotched-Regular.ttf and put it in ./Window/font (I don't provide one though)
-4. Install packages
+4. Install dependencies
     ```
-    pip install -r requirements.txt
+    poetry install
     ```
 5. run/debug main.py
 
@@ -21,4 +21,4 @@ originates from the [root repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)
 - [ ] Better decoration
 - [x] Multi-calculating SR at once
 - [x] Toggling Double Time or Half Time
-- [ ] Migrate pip environment to poetry
+- [x] Migrate pip environment to poetry

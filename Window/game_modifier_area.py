@@ -1,6 +1,6 @@
 import tkinter as tk
-from PIL import ImageTk
-from pathlib import Path
+from PIL import ImageTk, Image
+from .window_func import get_resource_path
 
 class GameModifierArea(tk.Frame):
     def __init__(self, master):
@@ -25,11 +25,11 @@ class GameModifierArea(tk.Frame):
         self.map_label.pack(side=tk.LEFT, padx=10)
 
     def button_area(self):
-        ht_path = Path(__file__).parents[0] / "icon\\game_modifier\\HT.png"
-        dt_path = Path(__file__).parents[0] / "icon\\game_modifier\\DT.png"
+        ht_path = get_resource_path("Window\\icon\\game_modifier\\HT.png")
+        dt_path = get_resource_path("Window\\icon\\game_modifier\\DT.png")
 
-        self.ht_image = ImageTk.PhotoImage(file=ht_path)
-        self.dt_image = ImageTk.PhotoImage(file=dt_path)
+        self.ht_image = ImageTk.PhotoImage(Image.open(ht_path))
+        self.dt_image = ImageTk.PhotoImage(Image.open(dt_path))
         self.halftime = tk.Radiobutton(self.frame,
                                   width=32,
                                   pady=10,

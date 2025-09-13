@@ -2,9 +2,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from .colormap import ColorMap
 import numpy as np
-from pathlib import Path
-from io import BytesIO
-from math import floor
+from .window_func import get_resource_path
 
 class RenderFont:
     def __init__(self, filename, fill=(0, 0, 0)):
@@ -68,9 +66,9 @@ class RenderFont:
 
         if type_ == "normal":
             if type(txt) is np.float64:
-                star_path = Path(__file__).parents[0] / "icon\\sr\\star.png"
+                star_path = get_resource_path("Window\\icon\\sr\\star.png")
                 if txt.item() > 6.5:
-                    star_path = Path(__file__).parents[0] / "icon\\sr\\star_gold.png"
+                    star_path = get_resource_path("Window\\icon\\sr\\star_gold.png")
                     self._fill = (255, 217, 102)
                 star_icon = Image.open(star_path)
                 star_icon = star_icon.resize((28, 28))
