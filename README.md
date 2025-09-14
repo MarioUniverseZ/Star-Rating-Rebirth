@@ -1,5 +1,5 @@
 # SR-Rebirth-GUI
-[中文][README_ZH.md]
+(中文)[README_ZH.md]
 forked from [sunnyxxy's repo](https://github.com/sunnyxxy/Star-Rating-Rebirth)(2025-03-04 version)<br>
 (Yes, this UI design comes from [Mapset Verifier](https://github.com/Naxesss/MapsetVerifier) and [Huggy's Spread Wizard](https://github.com/sinanates17/Huggeds-Mania-Spread-Wizard))
 ![image](https://github.com/user-attachments/assets/f44d8f69-26ad-42ee-afe9-509217eb5ef0)

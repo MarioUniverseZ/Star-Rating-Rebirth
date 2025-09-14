@@ -1,5 +1,5 @@
 # SR-Rebirth-GUI
-[English][README.md]
+(English)[README.md]
 這是從[sunnyxxy的repo](https://github.com/sunnyxxy/Star-Rating-Rebirth) fork出的GUI版本 (演算法版本使用2025-03-04)<br>
 (UI版面參考了[Mapset Verifier](https://github.com/Naxesss/MapsetVerifier)和[Huggy的Spread Wizard](https://github.com/sinanates17/Huggeds-Mania-Spread-Wizard))
 ![image](https://github.com/user-attachments/assets/f44d8f69-26ad-42ee-afe9-509217eb5ef0)
