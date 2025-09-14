@@ -1,8 +1,8 @@
 import os
 import sys
 sys.path.append("..")
-from osu_file_parser import parser, InvalidModeError
-from algorithm import calculate
+from Window.function.osu_file_parser import parser, InvalidModeError
+from Window.function.algorithm import calculate
 
 #credit: https://stackoverflow.com/a/42221437
 class ResultProcess:

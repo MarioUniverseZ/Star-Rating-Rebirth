@@ -3,7 +3,7 @@ import sys
 from enum import Enum
 from pathlib import Path
 
-import algorithm
+from Window.function.algorithm import calculate
 
 
 class Mod(Enum):
@@ -48,7 +48,7 @@ def main():
     while True:
         for file in Path(folder_path).iterdir():
             if file.suffix == ".osu":
-                result = algorithm.calculate(file, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
+                result = calculate(file, mod, 6, 0.8, w_0, w_1, p_1, w_2, p_0)
                 print(f"({mod}) {file.stem} | {result:.4f}")
         try:
             input("SR calculation completed. Press Enter to run again or 'Ctrl+C' to exit.")

@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import ImageTk, Image
-from .window_func import get_resource_path
+from Window.function.window_func import get_resource_path
 
 class GameModifierArea(tk.Frame):
     def __init__(self, master):
